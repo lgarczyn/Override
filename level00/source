@@ -1,0 +1,23 @@
+#include <stdio.h>
+
+int		main()
+{
+	puts("***********************************");
+	puts("* \t     -Level00 -\t\t  *");
+	puts("***********************************");
+
+	printf("Password:");
+
+	int i;
+	scanf("%i", &i);
+
+	if (i == 5276)
+	{
+		puts("\nAuthentificated");
+		system("/bin/sh");
+	}
+	else
+	{
+		puts("\nInvalid Password");
+	}
+}
