@@ -1,0 +1,60 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <strings.h>
+
+#define PASS_LEN 41
+
+int			main()
+{
+	//some stack bullshit
+
+	char	buff_file[100];//???
+	char	buff_user[100];
+	char	buff_pass[100];
+
+	FILE* file = fopen("/home/users/level03/.pass", "r");
+
+	if (!file)
+	{
+		fwrite("ERROR: failed to open password file\n", 1, 36, stderr);
+		exit(1);
+	}
+	int read = fread(buff_file, PASS_LEN, 1, file);
+	
+	buff_file[strcspn(buff_file, "\n")] = '\0';
+
+	if (read != PASS_LEN)
+	{
+		fwrite("ERROR: failed to open password file\n", 1, 36, stderr);
+		fwrite("ERROR: failed to open password file\n", 1, 36, stderr);
+		exit(1);
+	}
+	fclose(file);
+	puts("===== [ Secure Access System v1.0 ] ===");
+	puts("/**************************************");
+	puts("| You must login to access this system.");
+	puts("\\*************************************");
+
+	printf("--[ Username: ");
+	fgets(buff_user, 0x64, file);
+	buff_user[strcspn(buff_user, "\n")] = '\0';
+
+	printf("--[ Password: ");
+	fgets(buff_pass, 0x64, file);
+	buff_pass[strcspn(buff_pass, "\n")] = '\0';
+
+	puts("***************************************");
+
+	if (strncmp(buff_file, buff_pass, PASS_LEN) == 0)
+	{
+		printf("Greetings, %s!", buff_user);
+		system("/bin/sh");
+		return (0);
+	}
+	else
+	{
+		printf(buff_user);
+		puts(" does not have access!");
+		return (1);
+	}
+}
