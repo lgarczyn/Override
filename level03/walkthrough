@@ -1,0 +1,29 @@
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    walkthrough                                        :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: lgarczyn <lgarczyn@student.42.fr>          +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2019/05/22 21:41:18 by lgarczyn          #+#    #+#              #
+#    Updated: 2019/05/22 21:54:39 by lgarczyn         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
+The program looks quite complex at first sight, but is actually quite simple:
+
+* take an int as input
+* substract it from 322424845
+* use the result to xor every character of the string "Q}|u`sfg~sf{}|a3"
+* compare the resulting string to "Congratulations!"
+* if they are equal, execute "/bin/sh"
+
+We convert both strings to binary
+
+01010001 01111101 01111100 01110101 01100000 01110011 01100110 01100111 01111110 01110011 01100110 01111011 01111101 01111100 01100001 00110011
+01000011 01101111 01101110 01100111 01110010 01100001 01110100 01110101 01101100 01100001 01110100 01101001 01101111 01101110 01110011 00100001
+
+We notice that they are always different on the 5th and 2nd least significant bits.
+The xor key we are looking for is therefore "00010010", or 18
+
+We feed "322424845 - 18" to the program, or "322424827"
