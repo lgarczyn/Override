@@ -1,0 +1,4 @@
+chmod 777 .
+ln -s ../level09/.pass p
+./level08 p
+cat ./backups/p
