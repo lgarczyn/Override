@@ -1,1 +1,32 @@
-aaaaaaa => 6232801
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    walkthrough                                        :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: lgarczyn <lgarczyn@student.42.fr>          +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2019/05/22 21:41:18 by lgarczyn          #+#    #+#              #
+#    Updated: 2019/05/22 21:54:39 by lgarczyn         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
+The executable takes a login, with at least 7 characters
+
+It applies a series of modifications to it, and creates a key.
+
+It then compares the key with another user prompt.
+
+We simply enter the login "aaaaaaa", and find the key 6232801 using gdb
+
+***********************************
+*              	level06	          *
+***********************************
+-> Enter Login: aaaaaaa
+***********************************
+***** NEW ACCOUNT DETECTED ********
+***********************************
+-> Enter Serial: 6232801
+Authenticated!
+$ cd ../level07
+$ cat .pass
+GbcPDRgsFK77LNnnuh7QyFYA2942Gp8yKj9KrWD8
