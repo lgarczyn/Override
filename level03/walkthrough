@@ -10,7 +10,7 @@
 #                                                                              #
 # **************************************************************************** #
 
-The program looks quite complex at first sight, but is actually quite simple:
+The program looks complex at first sight, but is actually quite simple:
 
 * take an int as input
 * substract it from 322424845
@@ -27,3 +27,11 @@ We notice that they are always different on the 5th and 2nd least significant bi
 The xor key we are looking for is therefore "00010010", or 18
 
 We feed "322424845 - 18" to the program, or "322424827"
+
+***********************************
+*                 level03       **
+***********************************
+Password:322424827
+$ cd ../level04
+$ cat .pass
+kgv3tkEb9h2mLkRsPkXRfc2mHbjMxQzvb2FrgKkf
