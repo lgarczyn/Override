@@ -107,7 +107,7 @@ int main(int argc, char ** argv, char **env)
 	{
 		printf("Input command: ");
 
-		fgets(cmd, 20, stdin);
+		fgets(cmd, sizeof(cmd), stdin);
 
 		int len = strlen(cmd);
 		cmd[len - 1] = '\0';
@@ -118,7 +118,7 @@ int main(int argc, char ** argv, char **env)
 		{
 			ret = store_number(database);
 		}
-		else if (strncmp(cmd, "read", 5) == 0)
+		else if (strncmp(cmd, "read", 4) == 0)
 		{
 			ret = read_number(database);
 		}
