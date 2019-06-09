@@ -1,0 +1,141 @@
+#include <stdbool.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+int32_t clear_stdin(void);
+int32_t get_unum(void);
+int32_t read_number(int32_t * a1);
+int32_t store_number(int32_t * a1);
+
+int32_t clear_stdin(void)
+{
+    int c;
+	do
+	{
+		c = getchar();
+	} while (c != 10 && c != -1);
+	
+	return c;
+}
+
+int32_t get_unum()
+{
+    int32_t result = 0;
+    fflush(stdin);
+    scanf("%u", &result);
+    clear_stdin();
+    return result;
+}
+
+int store_number(int *database)
+{
+    printf(" Number: ");
+    int n = get_unum();
+    printf(" Index: ");
+    unsigned int i = get_unum();
+    if (i % 3)
+	{
+        if (n >> 0x18 != 0xB7)
+		{
+            database[i << 2] = n;
+            return 0;
+        }
+    }
+    puts(" *** ERROR! ***");
+    puts("   This index is reserved for wil!");
+    puts(" *** ERROR! ***");
+    return 1;
+}
+
+int read_number(int *database)
+{
+    printf(" Index: ");
+    int i = get_unum();
+    int n = database[i];
+    printf(" Number at data[%u] is %u\n", i, n);
+    return 0;
+}
+
+int main(int argc, char ** argv, char **env)
+{
+	// 0x0 -> 0x18 : temp values
+	// 0x18 -> 0x1c : env
+	// 0x1c -> 0x20: argv
+	// 0x24 -> 0x1b3 : database
+	// 0x1b4 -> 0x1b8 : return val
+	// 0x1b8 -> 0x1cc : cmd
+	// 0x1cc -> 0x1d0 : canary
+
+	char **env_ptr = env;
+	char **argv_ptr = argv;
+	int database[100] = {};
+	int ret = 0;
+	char cmd[20] = {};
+	int canary;
+
+	//canary shenanigan
+	(void)canary;
+	(void)argc;
+
+	while (*argv_ptr)
+	{
+		memset(*argv_ptr, 0, strlen(*argv_ptr));
+		argv_ptr++;
+	}
+
+	while (*env_ptr)
+	{
+		memset(*env_ptr, 0, strlen(*env_ptr));
+		env_ptr++;
+	}
+
+	puts(
+		"----------------------------------------------------\n"
+		"  Welcome to wil's crappy number database service!   \n"
+		"----------------------------------------------------\n"
+		" Commands:                                          \n"
+		"    store - store a number into the data database    \n"
+		"    read  - read a number from the data database     \n"
+		"    quit  - exit the program                        \n"
+		"----------------------------------------------------\n"
+		"   wil has reserved some database :>                 \n"
+		"----------------------------------------------------\n");
+	
+	while (true)
+	{
+		printf("Input command: ");
+
+		fgets(cmd, 20, stdin);
+
+		int len = strlen(cmd);
+		cmd[len - 1] = '\0';
+		
+		int ret;
+
+		if (strncmp(cmd, "store", 5) == 0)
+		{
+			ret = store_number(database);
+		}
+		else if (strncmp(cmd, "read", 5) == 0)
+		{
+			ret = read_number(database);
+		}
+		else if (strncmp(cmd, "quit", 4))
+		{
+			break;
+		}
+
+		if (ret)
+		{
+			printf(" Failed to do %s command\n", cmd);
+		}
+		else
+		{
+			printf(" Completed %s command successfully\n", cmd);
+		}
+		memset(cmd, 0, sizeof(cmd));
+	}
+	// More canary shenanigan	
+}
