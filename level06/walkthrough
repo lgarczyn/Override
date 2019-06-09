@@ -10,7 +10,7 @@
 #                                                                              #
 # **************************************************************************** #
 
-The executable takes a login, with at least 7 characters
+The executable takes a login, with at least 6 characters
 
 It applies a series of modifications to it, and creates a key.
 
