@@ -1,0 +1,87 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+void secret_backdoor(void) {
+    char cmd[128];		// rbp - 0x80 -> rbp -> 0x0
+
+    fgets(cmd, 128, stdin);
+    system(cmd);
+
+    return;
+}
+
+struct profile
+{
+	char message[140];
+	char name[40];
+	int message_len;
+};
+
+void set_username(struct profile *user)
+{
+						// rbp - 0xa0 -> rbp - 0x0
+	//struct profile*	// rbp - 0x98 -> rbp - 0x90
+	char buf[128] = {};	// rbp - 0x90 -> rbp - 0x10
+	int	i;				// rbp - 0x04 -> rbp - 0x0
+
+	puts(">: Enter your username");
+	printf(">>: ");
+
+	fgets(buf, sizeof(buf), stdin);
+
+	i = 0;
+	while (i <= sizeof(user->name))
+	{
+		char c = buf[i];
+
+		if (c == 0)
+			break;
+		
+		user->name[i] = c;
+		i++;
+	}
+	
+	printf(">: Welcome, %s", user->name);
+}
+
+void set_msg(struct profile *user)
+{
+							// rbp - 0x410 -> rbp - 0x0
+	//struct profile *user	// rbp - 0x410 -> rbp - 0x400
+	char buf[1024] = {};	// rbp - 0x400 -> rbp - 0x0
+
+	puts(">: Msg @Unix-Dude");
+	printf(">>: ");
+
+	fgets(buf, sizeof(buf), stdin);
+	strncpy(user->message, buf, user->message_len);
+}
+
+void handle_msg(void)
+{
+							// rbp - 0xC0 -> rbp - 0x0
+	//char	msg[140];		// rbp - 0xC0 -> rbp - 0x34
+	//char	name[40] = {};	// rbp - 0x34 -> rbp - 0x0C
+	//int	msg_len = 140;	// rbp - 0x0C -> rbp - 0x08
+	struct profile user;	// rbp - 0xC0 -> rbp -0x08
+
+	memset(user.name, '\0', sizeof(user.name));
+	user.message_len = sizeof(user.message);
+
+	set_username(&user);
+	set_msg(&user);
+
+	puts(">: Msg sent!");
+}
+
+int main(void)
+{
+	puts(
+		"--------------------------------------------\n"
+		"|   ~Welcome to l33t-m$n ~    v1337        |\n"
+		"--------------------------------------------\n"
+	);
+	handle_msg();
+	return (0);
+}
