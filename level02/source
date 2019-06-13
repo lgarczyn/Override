@@ -4,13 +4,19 @@
 
 #define PASS_LEN 41
 
+// 0x120 - 0x114=12
+// 0x114 - 0x110=4
+// 0x110 - 0xa0=112		//buff pass
+// 0xa0 - 0x70=48		//file
+// 0x70 - 0xc=100		//buff user
+// 0xc - 0x8=4
+// 0x8 - 0x0=8
+
 int			main()
 {
-	//some stack bullshit
-
-	char	buff_file[100];//???
-	char	buff_user[100];
 	char	buff_pass[100];
+	char	buff_file[PASS_LEN];
+	char	buff_user[100];
 
 	FILE* file = fopen("/home/users/level03/.pass", "r");
 
@@ -36,11 +42,11 @@ int			main()
 	puts("\\*************************************");
 
 	printf("--[ Username: ");
-	fgets(buff_user, 0x64, file);
+	fgets(buff_user, 100, file);
 	buff_user[strcspn(buff_user, "\n")] = '\0';
 
 	printf("--[ Password: ");
-	fgets(buff_pass, 0x64, file);
+	fgets(buff_pass, 100, file);
 	buff_pass[strcspn(buff_pass, "\n")] = '\0';
 
 	puts("***************************************");
