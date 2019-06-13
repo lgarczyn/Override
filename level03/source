@@ -74,7 +74,7 @@ int test(int a1, int a2)
 		case 19:
 		case 20:
 		case 21:
-		return decrypt(v4);
+		return decrypt(i);
 		break;
 		case 22:
 		default:
