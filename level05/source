@@ -5,7 +5,7 @@
 
 int main(int argc, char ** argv)
 {
-    int32_t		str[100];
+	int32_t		str[100];
 
 	fgets(str, 100, stdin);
 
