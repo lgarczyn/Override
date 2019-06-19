@@ -2,43 +2,46 @@
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
-#include <sys/prctl.h>
 #include <sys/wait.h>
 #include <unistd.h>
 #include <sys/ptrace.h>
+#include <sys/types.h>
 
 int main(int argc, char ** argv)
 {
-    int pid = fork();
-    char str[32];
-    
+	int pid = fork();
+	char str[0x80];
 	unsigned int stat_loc = 0;
-    if (pid != 0)
+	unsigned int syscall = 0;
+
+	// if parent
+	if (pid != 0)
 	{
-        while (true)
+		// do { get last syscall } while (syscall is not execve )
+		do
 		{
-            wait(&stat_loc);
-            if ((stat_loc % 12) >= 1)
-            {
-                puts("child is exiting...");
-                return 0;
-            }
-            if (ptrace(PTRACE_PEEKUSER) == 11)
-            {
-                break;
-            }
-            continue;
-        }
-        puts("no exec() for you");
-        kill(pid, SIGKILL);
-    }
+			// wait for the child process to syscall
+			wait(&stat_loc);
+			// if child process has exited, return
+			if ( WIFEXITED(stat_loc) )
+			{
+				puts("child is exiting...");
+				return 0;
+			}
+			// get the last syscall
+			syscall = ptrace(PTRACE_PEEKUSER, pid, 44, 0);
+		}
+		while ( syscall != 11);
+		puts("no exec() for you");
+		kill(pid, SIGKILL);
+	}
 	else
 	{
-        int v;
-        prctl(PR_SET_PDEATHSIG, 1, 0, 0, &v);
-        ptrace(PTRACE_TRACEME);
-        puts("Give me some shellcode, k");
-        gets(str);
-    }
-    return 0;
+		int v;
+		prctl(PR_SET_PDEATHSIG, 1, 0, 0, &v);
+		ptrace(PTRACE_TRACEME, 0, 0, 0);
+		puts("Give me some shellcode, k");
+		gets(str);
+	}
+	return 0;
 }
