@@ -7,29 +7,28 @@
 
 int auth(char *str, int serial) {
 
-    str[strcspn(str, "\n")] = '\0';
-    int len = strnlen(str, 32);
-    if (len <= 5) {
-        return 1;
-    }
-    if (ptrace(PTRACE_TRACEME, 0, 0, 0) == -1) {
-        puts("\033[32m.---------------------------.");
-        puts("\033[31m| !! TAMPERING DETECTED !!  |");
-        puts("\033[32m'---------------------------'");
-        return 1;
-    }
-    int key = ((int)str[3] ^ 0x1337) + 0x5eeded;
-    for (int i = 0; i < len; i++)
-    {
-        if (str[i] < ' ') {
-            return 1;
-        }
-        key = ((int)str[i] ^ key) % 1337 + key;
-    }
+	str[strcspn(str, "\n")] = '\0';
+	int len = strnlen(str, 32);
+	if (len <= 5) {
+		return 1;
+	}
+	if (ptrace(PTRACE_TRACEME, 0, 0, 0) == -1) {
+		puts("\033[32m.---------------------------.");
+		puts("\033[31m| !! TAMPERING DETECTED !!  |");
+		puts("\033[32m'---------------------------'");
+		return 1;
+	}
+	int key = ((int)str[3] ^ 0x1337) + 0x5eeded;
+	for (int i = 0; i < len; i++)
+	{
+		if (str[i] < ' ') {
+			return 1;
+		}
+		key = ((int)str[i] ^ key) % 1337 + key;
+	}
 
-    printf("res %i\n", key);
-   
-    return serial != key;
+	printf("res %i\n", key);
+	return serial != key;
 }
 
 // 0x1c -> 0x20 : argv ? env ?
@@ -38,26 +37,26 @@ int auth(char *str, int serial) {
 
 int main(int argc, char ** argv)
 {
-    char    login[32];
-    int     serial;
+	char	login[32];
+	int		serial;
 
-    puts("***********************************");
-    puts("*\t\tlevel06\t\t  *");
-    puts("***********************************");
-    printf("-> Enter Login: ");
-    fgets(login, sizeof(login), stdin);
+	puts("***********************************");
+	puts("*\t\tlevel06\t\t  *");
+	puts("***********************************");
+	printf("-> Enter Login: ");
+	fgets(login, sizeof(login), stdin);
 
-    puts("***********************************");
-    puts("***** NEW ACCOUNT DETECTED ********");
-    puts("***********************************");
-    printf("-> Enter Serial: ");
-    scanf("%u", &serial);
+	puts("***********************************");
+	puts("***** NEW ACCOUNT DETECTED ********");
+	puts("***********************************");
+	printf("-> Enter Serial: ");
+	scanf("%u", &serial);
 
-    int ret = 1;
-    if (auth(login, serial) == 0) {
-        puts("Authenticated!");
-        system("/bin/sh");
-        ret = 0;
-    }
-    return ret;
+	int ret = 1;
+	if (auth(login, serial) == 0) {
+		puts("Authenticated!");
+		system("/bin/sh");
+		ret = 0;
+	}
+	return ret;
 }
